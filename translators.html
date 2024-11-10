@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech-to-Text and Text-to-Speech Translator</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            font-size: 2em;
+            margin-bottom: 0.5em;
+            color: #2c3e50;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 1em;
+            margin-top: 1em;
+        }
+        .option-button {
+            padding: 1em 2em;
+            font-size: 1em;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            background-color: #3498db;
+            color: #ffffff;
+        }
+        #speech-to-text-section, #text-to-speech-section {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 2em;
+        }
+        textarea {
+            width: 300px;
+            height: 100px;
+            margin-top: 1em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Translator Options</h1>
+    <div class="options">
+        <button class="option-button" onclick="showSpeechToText()">Speech-to-Text</button>
+        <button class="option-button" onclick="showTextToSpeech()">Text-to-Speech</button>
+    </div>
+    <div id="speech-to-text-section">
+        <h2>Speech-to-Text</h2>
+        <textarea id="speech-to-text-output" placeholder="Your speech will be transcribed here..."></textarea>
+        <button onclick="startSpeechRecognition()">Start</button>
+    </div>
+    <div id="text-to-speech-section">
+        <h2>Text-to-Speech</h2>
+        <textarea id="text-to-speech-input" placeholder="Enter text to convert to speech..."></textarea>
+        <button onclick="startTextToSpeech()">Convert</button>
+    </div>
+
+    <script>
+        // Show Speech-to-Text section
+        function showSpeechToText() {
+            document.getElementById('speech-to-text-section').style.display = 'flex';
+            document.getElementById('text-to-speech-section').style.display = 'none';
+        }
+
+        // Show Text-to-Speech section
+        function showTextToSpeech() {
+            document.getElementById('speech-to-text-section').style.display = 'none';
+            document.getElementById('text-to-speech-section').style.display = 'flex';
+        }
+
+        // Speech Recognition setup
+        let recognition;
+        function startSpeechRecognition() {
+            if (!('webkitSpeechRecognition' in window)) {
+                alert("Your browser does not support speech recognition.");
+                return;
+            }
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.onresult = event => {
+                let transcript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    transcript += event.results[i][0].transcript;
+                }
+                document.getElementById('speech-to-text-output').value = transcript;
+            };
+            recognition.onerror = event => {
+                console.error("Speech recognition error: ", event);
+            };
+            recognition.start();
+        }
+
+        // Text-to-Speech setup
+        function startTextToSpeech() {
+            const text = document.getElementById('text-to-speech-input').value;
+            const utterance = new SpeechSynthesisUtterance(text);
+            window.speechSynthesis.speak(utterance);
+        }
+    </script>
+</body>
+</html>
